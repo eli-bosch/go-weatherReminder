@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/eli-bosch/go-weatherReminder/config"
 	"github.com/jinzhu/gorm"
 )
 
@@ -12,4 +13,48 @@ type Event struct {
 	//Relationship
 	User     User     `gorm:"foreignKey"`
 	Location Location `gorm:"foreignKey"`
+}
+
+func init() {
+	config.GetDB().AutoMigrate(Event{})
+}
+
+func (Event) TableName() string {
+	return "events"
+}
+
+func (e *Event) CreateEvent() *Event {
+	db := config.GetDB()
+
+	db.Table("events").NewRecord(e)
+	db.Table("events").Create(&e)
+
+	return e
+}
+
+func GetAllEvents() []Event {
+	var events []Event
+
+	db := config.GetDB()
+	db.Table("events").Where(&events)
+
+	return events
+}
+
+func GetEventById(ID int64) *Event {
+	var getEvent Event
+	db := config.GetDB()
+
+	db.Table("events").Where("ID=?", ID).Find(&getEvent)
+
+	return &getEvent
+}
+
+func DeleteEvent(ID int64) Event {
+	var event Event
+	db := config.GetDB()
+
+	db.Table("events").Where("ID=?", ID).Delete(&event)
+
+	return event
 }
