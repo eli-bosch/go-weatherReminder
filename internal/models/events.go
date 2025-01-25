@@ -50,6 +50,15 @@ func GetEventById(ID int64) *Event {
 	return &getEvent
 }
 
+func GetEventByUserId(ID int64) []Event {
+	var getEvents []Event
+	db := config.GetDB()
+
+	db.Table("events").Where("user_id=?", ID).Find(&getEvents)
+
+	return getEvents
+}
+
 func DeleteEvent(ID int64) Event {
 	var event Event
 	db := config.GetDB()
