@@ -11,10 +11,10 @@ import (
 )
 
 var (
-	db *gorm.DB
+	DB *gorm.DB
 )
 
-func Connect() {
+func Connect() *gorm.DB {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -31,12 +31,13 @@ func Connect() {
 
 	d, err := gorm.Open("mysql", dsn)
 	if err != nil {
-		log.Fatalf("Failed to connect to the database: %v", err)
+		log.Fatalf("Failed to connect to the database. Error: %v", err)
 	}
 
-	db = d
+	DB = d
+	return d
 }
 
 func GetDB() *gorm.DB {
-	return db
+	return DB
 }

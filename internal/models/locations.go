@@ -15,10 +15,6 @@ type Location struct {
 	Latitude  float64 `json:"latitude"`
 }
 
-func init() {
-	config.GetDB().AutoMigrate(Location{})
-}
-
 func (Location) TableName() string {
 	return "locations"
 }

@@ -1,19 +1,17 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/eli-bosch/go-weatherReminder/config"
 	"github.com/jinzhu/gorm"
 )
 
 type User struct {
 	gorm.Model
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-func init() {
-	config.GetDB().AutoMigrate(User{})
+	Username string `gorm:"column:username" json:"username"`
+	Email    string `gorm:"column:email" json:"email"`
+	Password string `gorm:"column:password" json:"password"`
 }
 
 func (User) TableName() string {
@@ -22,9 +20,12 @@ func (User) TableName() string {
 
 func (u *User) CreateUser() *User {
 	db := config.GetDB()
+	err := db.Create(&u).Error
 
-	db.Table("events").NewRecord(u)
-	db.Table("locations").Create(&u)
+	if err != nil {
+		fmt.Printf("Error creating user: %v\n", err)
+		return nil
+	}
 
 	return u
 }
@@ -33,7 +34,11 @@ func GetAllUsers() []User {
 	var Users []User
 
 	db := config.GetDB()
-	db.Table("events").Find(&Users)
+	err := db.Find(&Users).Error
+	if err != nil {
+		fmt.Printf("Error finding users: %v\n", err)
+		return nil
+	}
 
 	return Users
 }
