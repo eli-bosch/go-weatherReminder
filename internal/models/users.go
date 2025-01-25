@@ -47,6 +47,24 @@ func GetUserById(ID int64) *User {
 	return &getUser
 }
 
+func GetUserByUserName(username string) *User {
+	var getUser User
+	db := config.GetDB()
+
+	db.Table("users").Where("username=?", username).Find(&getUser)
+
+	return &getUser
+}
+
+func GetUserByEmail(email string) *User {
+	var getUser User
+	db := config.GetDB()
+
+	db.Table("users").Where("email=?", email).Find(&getUser)
+
+	return &getUser
+}
+
 func DeleteUser(ID int64) User {
 	var user User
 	db := config.GetDB()
