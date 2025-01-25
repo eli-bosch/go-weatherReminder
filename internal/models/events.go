@@ -15,10 +15,6 @@ type Event struct {
 	Location Location `gorm:"foreignKey"`
 }
 
-func init() {
-	config.GetDB().AutoMigrate(Event{})
-}
-
 func (Event) TableName() string {
 	return "events"
 }
