@@ -36,7 +36,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // GET methods
-func GetUsers(w http.ResponseWriter, r *http.Request) { //Get all users
+func GetUsers(w http.ResponseWriter, r *http.Request) {
 	newUsers := models.GetAllUsers()
 	res, err := json.Marshal(newUsers)
 	if err != nil {
