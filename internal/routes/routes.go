@@ -19,12 +19,12 @@ var RegisterWeatherReminderRoutes = func(router *mux.Router) {
 	//router.HandleFunc("/user/{user_id}", controller.UpdateUser).Methods("DELETE").HandlerFunc(middleware.AuthMiddleware)
 
 	//Location Routes
-	router.HandleFunc("/location/", controller.CreateLocation).Methods("POST")                 //Creates location from supplied json body
-	router.HandleFunc("/location/", controller.GetLocations).Methods("GET")                    //Gets all users - debugging method
-	router.HandleFunc("/location/{location_id", controller.GetLocationById).Methods("GET")     //Gets user from user id
-	router.HandleFunc("/location/find", controller.FindLocation).Methods("PUT")                //Finds location by json body filled by user
-	router.HandleFunc("/location/{location_id}", controller.UpdateLocation).Methods("PUT")     //Updates user from supplied json body
-	router.HandleFunc("/loocation/{location_id}", controller.DeleteLocation).Methods("DELETE") //Deletes user and returns their profile
+	router.HandleFunc("/location/", controller.CreateLocation).Methods("POST")                //Creates location from supplied json body
+	router.HandleFunc("/location/", controller.GetLocations).Methods("GET")                   //Gets all users - debugging method
+	router.HandleFunc("/location/{location_id}", controller.GetLocationById).Methods("GET")   //Gets user from user id
+	router.HandleFunc("/location/find", controller.FindLocation).Methods("GET")               //Finds location by json body filled by user
+	router.HandleFunc("/location/{location_id}", controller.UpdateLocation).Methods("PUT")    //Updates user from supplied json body
+	router.HandleFunc("/location/{location_id}", controller.DeleteLocation).Methods("DELETE") //Deletes user and returns their profile
 
 	//Event Routes
 	router.HandleFunc("/user/events/", controller.CreateEvent).Methods("POST")             //Creates new Event - needs protections

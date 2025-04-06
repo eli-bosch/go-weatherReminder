@@ -55,6 +55,9 @@ func GetLocationById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	locationDetails := models.GetLocationById(ID)
+
+	//FIX: Needs to update weather if this gets called (maybe not)
+
 	res, err := json.Marshal(locationDetails)
 	if err != nil {
 		fmt.Println("Error while marshalling json body")
@@ -66,11 +69,38 @@ func GetLocationById(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
-// PUT methods
 func FindLocation(w http.ResponseWriter, r *http.Request) {
-	//FIX: Implement findlocation PUT method - API in frontend?
+	//FIX: Finds location by json body
+	userLocation := models.Location{}
+	utils.ParseBody(r, userLocation)
+
+	if userLocation.City == "" || userLocation.Postal == "" {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(nil)
+		return
+	}
+
+	location := models.GetLocationByCityAndPostal(userLocation.City, userLocation.Postal)
+	if location == nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+		w.Write(nil)
+		return
+	}
+
+	res, err := json.Marshal(location)
+	if err != nil {
+		fmt.Println("Error while parsing Id")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
 }
 
+// PUT methods
 func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	locationId := vars["location_id"]
