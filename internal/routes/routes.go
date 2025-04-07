@@ -29,6 +29,6 @@ var RegisterWeatherReminderRoutes = func(router *mux.Router) {
 	//Event Routes
 	router.HandleFunc("/user/events/", controller.CreateEvent).Methods("POST")             //Creates new Event - needs protections
 	router.HandleFunc("/user/events/", controller.GetEvents).Methods("GET")                //Gets all Events for user - needs protections
-	router.HandleFunc("/user/events/{event_id}", controller.UpdateEvent).Methods("PUT")    //Update an event - needs protections
+	router.HandleFunc("/user/events/{event_id}", controller.UpdateEvent).Methods("PUT")    //Update an event - not needed for all intents
 	router.HandleFunc("/user/events/{event_id}", controller.DeleteEvent).Methods("DELETE") //Delete an event - needs protections
 }
