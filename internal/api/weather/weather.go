@@ -23,8 +23,7 @@ type WeatherResponse struct {
 
 func FetchWeather(Longitude float64, Latitude float64) (*WeatherResponse, error) {
 	apiKey := os.Getenv("WEATHER_API_KEY") //Make name more descriptive
-	url := fmt.Sprintf("https://api.openweathermap.org/data/2.5/weather?lat=%.2f&lon=%.2f&appid=%s", Latitude, Longitude, apiKey)
-	fmt.Printf(url)
+	url := fmt.Sprintf("https://api.openweathermap.org/data/2.5/weather?lat=%.2f&lon=%.2f&units=imperial&appid=%s", Latitude, Longitude, apiKey)
 
 	res, err := http.Get(url)
 	if err != nil {

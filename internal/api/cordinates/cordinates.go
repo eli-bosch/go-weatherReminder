@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type CordinateResponse struct {
@@ -18,9 +21,15 @@ type CordinateResponse struct {
 }
 
 func FetchState(City string, State string, Country string) (*CordinateResponse, error) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	apiKey := os.Getenv("WEATHER_API_KEY")
-	url := fmt.Sprintf("https://api.openweathermap.org/data/2.5/weather?q=%s,%s,%s&appid=%s", City, State, Country, apiKey)
-	fmt.Printf(url)
+
+	url := fmt.Sprintf("http://api.openweathermap.org/geo/1.0/direct?q=%s,%s,%s&limit=1&appid=%s", City, State, Country, apiKey)
+	fmt.Println()
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -33,11 +42,15 @@ func FetchState(City string, State string, Country string) (*CordinateResponse, 
 		return nil, err
 	}
 
-	var cordiateData CordinateResponse
+	var cordiateData []CordinateResponse
 	err = json.Unmarshal(body, &cordiateData)
 	if err != nil {
 		return nil, err
 	}
 
-	return &cordiateData, nil
+	if len(cordiateData) == 0 {
+		return nil, fmt.Errorf("no location data found for %s, %s, %s", City, State, Country)
+	}
+
+	return &cordiateData[0], nil
 }
