@@ -25,9 +25,9 @@ func (Location) TableName() string {
 
 func (l *Location) CreateLocation() *Location {
 	db := config.GetDB()
-	exists := checkEntryExists(l, db)
+	exists := GetLocationByCityAndPostal(l.City, l.Postal)
 
-	if exists == nil {
+	if exists != nil {
 		return exists
 	}
 
@@ -79,17 +79,11 @@ func DeleteLocation(ID int64) Location {
 	return location
 }
 
-//Private methods
-
-func checkEntryExists(l *Location, db *gorm.DB) *Location {
-	var location Location
-
-	return &location
-}
-
 //API interactions needed for this project
 
 func addCordinates(l *Location) *Location {
+
+	//FIX: Implement this method
 
 	return l
 }
