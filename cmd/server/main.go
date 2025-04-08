@@ -8,6 +8,7 @@ import (
 	"time"
 
 	_ "github.com/eli-bosch/go-weatherReminder/internal/db"
+	"github.com/eli-bosch/go-weatherReminder/internal/email"
 	"github.com/eli-bosch/go-weatherReminder/internal/models"
 	"github.com/eli-bosch/go-weatherReminder/internal/routes"
 	"github.com/gorilla/mux"
@@ -32,7 +33,7 @@ func startWeatherReminderJob() {
 		select {
 		case <-ticker.C:
 			fmt.Println("Running reminder job at", time.Now())
-			//ADD text api
+			runWeatherReminderJob()
 		}
 	}
 }
@@ -52,6 +53,9 @@ func runWeatherReminderJob() {
 		}
 
 		body := location.WeatherDescription + " @ " + strconv.FormatFloat(location.FeelsLike, 'f', 1, 64) + "°F"
-		email.sendEmailWithSendGrid(user.Email, location.MainWeather, body)
+		err := email.SendEmailWithSendGrid(user.Email, location.MainWeather, body)
+		if err != nil {
+			fmt.Printf("Error sending the email to ", user.Email)
+		}
 	}
 }
