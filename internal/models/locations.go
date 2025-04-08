@@ -1,7 +1,11 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/eli-bosch/go-weatherReminder/config"
+	cordinates "github.com/eli-bosch/go-weatherReminder/internal/api/cordinates"
+	weather "github.com/eli-bosch/go-weatherReminder/internal/api/weather"
 	"github.com/jinzhu/gorm"
 )
 
@@ -15,6 +19,7 @@ type Location struct {
 	Latitude           float64 `json:"latitude"`
 	MainWeather        string  `gorm:"main_weather"`
 	WeatherDescription string  `gorm:"description_weather"`
+	FeelsLike          float64 `gorm:feels_like`
 }
 
 func (Location) TableName() string {
@@ -32,7 +37,11 @@ func (l *Location) CreateLocation() *Location {
 	}
 
 	l = addCordinates(l)
+	if l == nil {
+		return nil
+	}
 
+	l = addWeather(l)
 	if l == nil {
 		return nil
 	}
@@ -41,6 +50,32 @@ func (l *Location) CreateLocation() *Location {
 	db.Table("locations").Create(&l)
 
 	return l
+}
+
+func (l *Location) UpdateWeatherFields() error {
+	db := config.GetDB()
+
+	var existing Location
+	if err := db.First(&existing, l.ID).Error; err != nil {
+		fmt.Println("ERROR: Location not found for weather update")
+		return err
+	}
+
+	l = addWeather(l)
+	if l == nil {
+		return fmt.Errorf("ERROR: failed to fetch weather")
+	}
+
+	// Apply the updated weather data to the existing record
+	db.Model(&existing).Updates(map[string]interface{}{
+		"latitude":            l.Latitude,
+		"longitude":           l.Longitude,
+		"main_weather":        l.MainWeather,
+		"description_weather": l.WeatherDescription,
+		"feels_like":          l.FeelsLike,
+	})
+
+	return nil
 }
 
 func GetAllLocations() []Location {
@@ -82,8 +117,28 @@ func DeleteLocation(ID int64) Location {
 //API interactions needed for this project
 
 func addCordinates(l *Location) *Location {
+	cord, err := cordinates.FetchState(l.City, l.Region, l.Country)
+	if err != nil {
+		fmt.Println("ERROR FETCHING CORDINATES: ", err)
+		return nil
+	}
 
-	//FIX: Implement this method
+	l.Latitude = cord.Latitude
+	l.Longitude = cord.Longitude
+
+	return l
+}
+
+func addWeather(l *Location) *Location {
+	curWeather, err := weather.FetchWeather(l.Longitude, l.Latitude)
+	if err != nil {
+		fmt.Println("ERROR FETCHING CORDINATES: ", err)
+		return nil
+	}
+
+	l.MainWeather = curWeather.Weather[0].Main
+	l.WeatherDescription = curWeather.Weather[0].Description
+	l.FeelsLike = curWeather.Main.FeelsLike
 
 	return l
 }

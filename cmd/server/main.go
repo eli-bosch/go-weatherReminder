@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	_ "github.com/eli-bosch/go-weatherReminder/internal/db"
+	"github.com/eli-bosch/go-weatherReminder/internal/models"
 	"github.com/eli-bosch/go-weatherReminder/internal/routes"
 	"github.com/gorilla/mux"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -32,5 +34,24 @@ func startWeatherReminderJob() {
 			fmt.Println("Running reminder job at", time.Now())
 			//ADD text api
 		}
+	}
+}
+
+func runWeatherReminderJob() {
+	allEvents := models.GetAllEvents()
+	for _, event := range allEvents {
+		location := models.GetLocationById(int64(event.LocationID))
+		user := models.GetUserById(int64(event.UserID))
+
+		if time.Since(location.UpdatedAt) > 5*time.Minute {
+			err := location.UpdateWeatherFields()
+			if err != nil {
+				fmt.Printf("Failed to fetch weather for ", location)
+				continue
+			}
+		}
+
+		body := location.WeatherDescription + " @ " + strconv.FormatFloat(location.FeelsLike, 'f', 1, 64) + "°F"
+		email.sendEmailWithSendGrid(user.Email, location.MainWeather, body)
 	}
 }
